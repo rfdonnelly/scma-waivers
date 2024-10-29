@@ -1,0 +1,31 @@
+#!/usr/bin/env ruby
+
+require "scma_smartwaiver"
+
+require 'smartwaiver-sdk/search_client'
+
+SMARTWAIVER_API_KEY = ENV["SMARTWAIVER_API_KEY"]
+
+client = SmartwaiverSearchClient.new(SMARTWAIVER_API_KEY)
+results = client.search("", "2024-01-01 00:00:00")
+
+# TODO check for errors
+puts results
+
+search = results[:search]
+
+names = []
+pages = search[:pages]
+guid = search[:guid]
+
+# DEBUG
+pages = 1
+
+(0...pages.to_i).each do |page|
+  waivers = client.results(guide, page)
+
+  # TODO check for errors
+  puts results
+
+  waivers.append(results[:search_results])
+end
