@@ -1,6 +1,6 @@
-# SCMA SmartWaiver
+# SCMA Smartwaiver
 
-WIP to download waivers from SmartWaiver, generate a easily accessible report
+WIP to download waivers from Smartwaiver, generate a easily accessible report
 (e.g., CSV), upload to SCMA website.
 
 ## Run
