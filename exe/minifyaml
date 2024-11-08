@@ -1,0 +1,63 @@
+#!/usr/bin/env ruby
+
+require "scma_smartwaiver"
+require 'yaml'
+
+def transform_waiver(waiver)
+  if waiver[:isMinor]
+    transform_waiver_minor(waiver)
+  else
+    transform_waiver_adult(waiver)
+  end
+end
+
+def transform_waiver_minor(waiver)
+  waiver[:participants].map do |participant|
+    {
+      createdOn: waiver[:createdOn],
+      firstName: participant[:firstName],
+      lastName: participant[:lastName],
+      phone: waiver[:guardian][:phone],
+      emergencyContact: [waiver[:emergencyContactName], waiver[:emergencyContactPhone]].join(' '),
+      guardian: [waiver[:guardian][:firstName], waiver[:guardian][:lastName]].join(' '),
+    }
+  end
+end
+
+def transform_waiver_adult(waiver)
+  waiver[:participants].map do |participant|
+    {
+      createdOn: waiver[:createdOn],
+      firstName: participant[:firstName],
+      lastName: participant[:lastName],
+      phone: participant[:phone],
+      emergencyContact: [waiver[:emergencyContactName], waiver[:emergencyContactPhone]].join(' '),
+      guardian: "n/a",
+    }
+  end
+end
+
+def transform(waivers)
+  waivers.flat_map(&method(:transform_waiver))
+end
+
+def dedupe(waivers)
+  # Rules:
+  # * always keep latest dupe
+  # * dedupe based on lower case name
+  # * dedupe adults based on lower case last name + phone number
+  waivers
+    .sort_by { |waiver| waiver[:createdOn] }
+    .uniq { |waiver| [waiver[:lastName].downcase, waiver[:firstName].downcase] }
+end
+
+def sort(waivers)
+  waivers.sort_by { |waiver| [waiver[:lastName], waiver[:firstName]] }
+end
+
+
+waivers = YAML.load(ARGF.read)
+waivers = transform(waivers)
+waivers = dedupe(waivers)
+waivers = sort(waivers)
+puts waivers.to_yaml

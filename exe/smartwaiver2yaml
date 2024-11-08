@@ -3,29 +3,33 @@
 require "scma_smartwaiver"
 
 require 'smartwaiver-sdk/search_client'
+require 'yaml'
 
 SMARTWAIVER_API_KEY = ENV["SMARTWAIVER_API_KEY"]
 
 client = SmartwaiverSearchClient.new(SMARTWAIVER_API_KEY)
-results = client.search("", "2024-01-01 00:00:00")
+results = client.search("", "2020-01-01 00:00:00")
 
 # TODO check for errors
-puts results
+$stderr.puts results.to_yaml
 
 search = results[:search]
 
 names = []
+waivers = []
 pages = search[:pages]
 guid = search[:guid]
 
 # DEBUG
-pages = 1
+# pages = 1
 
 (0...pages.to_i).each do |page|
-  waivers = client.results(guide, page)
+  results = client.results(guid, page)
 
   # TODO check for errors
-  puts results
+  $stderr.puts results.to_yaml
 
-  waivers.append(results[:search_results])
+  waivers.push(*results[:search_results])
 end
+
+puts waivers.to_yaml

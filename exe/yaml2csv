@@ -1,0 +1,22 @@
+#!/usr/bin/env ruby
+
+require "scma_smartwaiver"
+require 'yaml'
+require 'csv'
+
+def to_csv(waivers)
+  CSV.generate do |csv|
+    csv << ["Name", "Phone", "Guardian", "Emergency Contact"]
+    waivers.each do |waiver|
+      csv << [
+        [waiver[:firstName], waiver[:lastName]].join(' '),
+        waiver[:phone],
+        waiver[:guardian],
+        waiver[:emergencyContact],
+      ]
+    end
+  end
+end
+
+waivers = YAML.load(ARGF.read)
+puts to_csv(waivers)
