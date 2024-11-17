@@ -6,10 +6,12 @@ require 'csv'
 
 def to_csv(waivers)
   CSV.generate do |csv|
-    csv << ["Name", "Phone", "Emergency Contact", "Guardian"]
+    csv << ["Name", "Date", "Phone", "Emergency Contact", "Guardian"]
     waivers.each do |waiver|
+      date = DateTime.parse(waiver[:createdOn]).strftime("%D")
       csv << [
         [waiver[:firstName], waiver[:lastName]].join(' '),
+        date,
         waiver[:phone],
         waiver[:emergencyContact],
         waiver[:guardian],
