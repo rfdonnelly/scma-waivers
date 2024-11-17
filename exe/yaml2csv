@@ -3,6 +3,7 @@
 require "scma_smartwaiver"
 require 'yaml'
 require 'csv'
+require "date"
 
 def to_csv(waivers)
   CSV.generate do |csv|
