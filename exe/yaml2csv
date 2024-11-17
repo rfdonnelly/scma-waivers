@@ -6,13 +6,13 @@ require 'csv'
 
 def to_csv(waivers)
   CSV.generate do |csv|
-    csv << ["Name", "Phone", "Guardian", "Emergency Contact"]
+    csv << ["Name", "Phone", "Emergency Contact", "Guardian"]
     waivers.each do |waiver|
       csv << [
         [waiver[:firstName], waiver[:lastName]].join(' '),
         waiver[:phone],
-        waiver[:guardian],
         waiver[:emergencyContact],
+        waiver[:guardian],
       ]
     end
   end
