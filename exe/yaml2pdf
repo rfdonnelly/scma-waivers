@@ -1,0 +1,102 @@
+#!/usr/bin/env ruby
+
+require "scma_smartwaiver"
+require "yaml"
+require "prawn"
+require "date"
+
+def to_pdf(waivers)
+  info = {
+    Title: "SCMA Waiver List",
+    Author: "Rob Donnelly",
+    Creator: "SCMA Smartwaivers",
+    CreationDate: Time.now,
+  }
+
+  pdf = Prawn::Document.new(info: info) do
+    font 'Helvetica', size: 10
+
+    header_size = font_size
+    footer_size = 15
+
+    repeat(:all) do
+      # header
+      bounding_box [bounds.left, bounds.top], :width  => bounds.width do
+        text "SCMA Waivers", align: :center, size: header_size
+        stroke_horizontal_rule
+      end
+
+      # footer
+      bounding_box [bounds.left, bounds.bottom + 15], :width  => bounds.width do
+        stroke_horizontal_rule
+        move_down(5)
+        text format("Last updated: %s", info[:CreationDate]), align: :left, size: font_size
+      end
+    end
+
+    x = 0
+    y = bounds.top - header_size
+    col = 0
+
+    # cols = [[60, :left], [60, :left], [50, :right]]
+    cols = [[120, :left], [50, :right]]
+
+    waivers.each do |waiver|
+      date = DateTime.parse(waiver[:createdOn]).strftime("%D")
+
+      # Next line
+      y -= font_size
+
+      if y < font_size + footer_size
+        y = bounds.top - header_size - font_size
+
+        if col >= 2
+          # Next page
+          x = 0
+          col = 0
+          start_new_page
+        else
+          # Next column
+          x += 180
+          col += 1
+        end
+      end
+
+      fields = [
+        format("%s, %s", waiver[:lastName], waiver[:firstName]),
+        date,
+      ]
+
+      dx = x
+      cols.zip(fields).each do |(col_width, align), field|
+        field_width = width_of(field, size: font_size)
+        offset =
+          case align
+          when :left then 0
+          when :right then col_width - field_width
+          when :center then (col_width - field_width) / 2
+          end
+
+        begin
+          text_box(field, at: [dx + offset, y])
+        rescue => e
+          $stderr.puts e.message
+        end
+
+        dx += col_width
+      end
+    end
+
+    options = {
+      :at => [bounds.right - 150, font_size],
+      :width => 150,
+      :align => :right,
+    }
+    number_pages("Page <page> of <total>", options)
+  end
+
+  pdf.render
+end
+
+waivers = YAML.load(ARGF.read)
+puts to_pdf(waivers)
