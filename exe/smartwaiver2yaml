@@ -11,7 +11,7 @@ client = SmartwaiverSearchClient.new(SMARTWAIVER_API_KEY)
 results = client.search("", "2020-01-01 00:00:00")
 
 # TODO check for errors
-$stderr.puts results.to_yaml
+# $stderr.puts results.to_yaml
 
 search = results[:search]
 
@@ -27,7 +27,7 @@ guid = search[:guid]
   results = client.results(guid, page)
 
   # TODO check for errors
-  $stderr.puts results.to_yaml
+  # $stderr.puts results.to_yaml
 
   waivers.push(*results[:search_results])
 end
