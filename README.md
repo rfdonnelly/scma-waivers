@@ -1,7 +1,6 @@
 # SCMA Smartwaiver
 
-WIP to download waivers from Smartwaiver, generate a easily accessible report
-(e.g., CSV), upload to SCMA website.
+Automation that downloads waivers from Smartwaiver, generates CSV and PDF reports, and uploads them to the SCMA website.
 
 ## Run
 
