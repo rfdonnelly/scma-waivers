@@ -1,0 +1,27 @@
+name: Cron
+on:
+  workflow_dispatch:
+  schedule:
+      # Run every day at 2:30am PST (10:30am UTC)
+    - cron: '30 10 * * *'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Ruby ${{ matrix.ruby }}
+    strategy:
+      matrix:
+        ruby:
+          - '3.2.3'
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: ${{ matrix.ruby }}
+        bundler-cache: true
+    - name: Install deps
+      run: bundle install
+    - name: Run the default task
+      run: bundle exec rake update-waivers

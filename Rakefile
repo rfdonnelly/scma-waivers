@@ -28,3 +28,5 @@ end
 task "upload" => %w[waivers.csv waivers.pdf] do
   sh "waivers2scma"
 end
+
+task "update-waivers" => "upload"
