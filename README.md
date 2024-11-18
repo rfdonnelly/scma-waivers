@@ -14,6 +14,8 @@ bundle install --path vendor/bundle
 bundle exec smartwaiver2yaml > waivers.yml
 bundle exec minifyaml < waivers.yml > waivers-min.yml
 bundle exec yaml2csv < waivers-min.yml > waivers.csv
+bundle exec yaml2pdf < waivers-min.yml > waivers.pdf
+bundle exec waivers2scma
 ```
 
 ## References
