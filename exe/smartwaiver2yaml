@@ -8,10 +8,11 @@ require 'yaml'
 SMARTWAIVER_API_KEY = ENV["SMARTWAIVER_API_KEY"]
 
 client = SmartwaiverSearchClient.new(SMARTWAIVER_API_KEY)
+$stderr.puts "Request Smartwaiver search..."
 results = client.search("", "2020-01-01 00:00:00")
 
 # TODO check for errors
-# $stderr.puts results.to_yaml
+$stderr.puts results.to_yaml
 
 search = results[:search]
 
@@ -24,6 +25,7 @@ guid = search[:guid]
 # pages = 1
 
 (0...pages.to_i).each do |page|
+  $stderr.puts format("Fetching search results page %s of %s", page + 1, pages.to_i)
   results = client.results(guid, page)
 
   # TODO check for errors
