@@ -1,0 +1,17 @@
+#!/usr/bin/env ruby
+
+require "scma_smartwaiver"
+
+require "net/ftp"
+
+options = {
+  username: ENV["SCMA_FTP_USERNAME"],
+  password: ENV["SCMA_FTP_PASSWORD"],
+  debug_mode: true,
+}
+
+Net::FTP.new("ftp.rockclimbing.org", options) do |ftp|
+  ftp.chdir("/public_html/Documents/_TripLeader")
+  ftp.putbinaryfile("waivers.pdf")
+  ftp.puttextfile("waivers.csv")
+end
