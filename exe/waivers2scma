@@ -10,7 +10,7 @@ options = {
   debug_mode: true,
 }
 
-Net::FTP.new("ftp.rockclimbing.org", options) do |ftp|
+Net::FTP.open("ftp.rockclimbing.org", options) do |ftp|
   ftp.chdir("/public_html/Documents/_TripLeader")
   ftp.putbinaryfile("waivers.pdf")
   ftp.puttextfile("waivers.csv")
