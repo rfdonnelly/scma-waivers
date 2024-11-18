@@ -25,3 +25,7 @@ jobs:
         bundler-cache: true
     - name: Run the default task
       run: bundle exec rake
+      env:
+        SMARTWAIVER_API_KEY: ${{ secrets.SMARTWAIVER_API_KEY }}
+        SCMA_FTP_USERNAME: ${{ secrets.SCMA_FTP_USERNAME }}
+        SCMA_FTP_PASSWORD: ${{ secrets.SCMA_FTP_PASSWORD }}
