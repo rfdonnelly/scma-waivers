@@ -2,6 +2,8 @@
 
 Automation that downloads waivers from Smartwaiver, generates CSV and PDF reports, and uploads them to the SCMA website.
 
+![image](images/dataflow.drawio.svg)
+
 ## Run
 
 Set the following environment variables:
