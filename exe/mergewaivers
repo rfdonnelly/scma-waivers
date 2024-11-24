@@ -1,0 +1,9 @@
+#!/usr/bin/env ruby
+
+require "scma_waivers"
+require 'yaml'
+
+puts YAML.load_stream(ARGF.read)
+  .flatten
+  .sort_by { |waiver| [waiver[:lastName], waiver[:firstName]] }
+  .to_yaml

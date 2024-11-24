@@ -1,4 +1,4 @@
-# SCMA Smartwaiver
+# SCMA Waivers
 
 Automation that downloads waivers from Smartwaiver, generates CSV and PDF reports, and uploads them to the SCMA website.
 

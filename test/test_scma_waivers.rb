@@ -2,9 +2,9 @@
 
 require "test_helper"
 
-class TestScmaSmartwaiver < Minitest::Test
+class TestScmaWaivers < Minitest::Test
   def test_that_it_has_a_version_number
-    refute_nil ::ScmaSmartwaiver::VERSION
+    refute_nil ::ScmaWaivers::VERSION
   end
 
   def test_it_does_something_useful

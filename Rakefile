@@ -9,12 +9,20 @@ require "standard/rake"
 
 task default: %i[test standard]
 
-task "smartwaivers.yml" do
-  sh "smartwaiver2yaml >smartwaivers.yml"
+multitask "smartwaivers_raw.yml" do
+  sh "smartwaiver2yaml >smartwaivers_raw.yml"
 end
 
-file "waivers.yml" => "smartwaivers.yml" do
-  sh "minifyaml <smartwaivers.yml >waivers.yml"
+multitask "paperwaivers.yml" do
+  sh "gsheets2yaml >paperwaivers.yml"
+end
+
+file "smartwaivers.yml" => "smartwaivers_raw.yml" do
+  sh "minifyaml <smartwaivers_raw.yml >smartwaivers.yml"
+end
+
+file "waivers.yml" => ["paperwaivers.yml", "smartwaivers.yml"] do
+  sh "mergewaivers paperwaivers.yml smartwaivers.yml >waivers.yml"
 end
 
 file "waivers.csv" => "waivers.yml" do
@@ -25,8 +33,8 @@ file "waivers.pdf" => "waivers.yml" do
   sh "yaml2pdf <waivers.yml >waivers.pdf"
 end
 
-task "upload" => %w[waivers.csv waivers.pdf] do
+multitask "upload" => %w[waivers.csv waivers.pdf] do
   sh "waivers2scma"
 end
 
-task "update-waivers" => "upload"
+multitask "update-waivers" => "upload"

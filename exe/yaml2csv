@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-require "scma_smartwaiver"
+require "scma_waivers"
 require 'yaml'
 require 'csv'
 require "date"

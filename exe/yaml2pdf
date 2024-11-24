@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-require "scma_smartwaiver"
+require "scma_waivers"
 require "yaml"
 require "prawn"
 require "date"
@@ -9,7 +9,7 @@ def to_pdf(waivers)
   info = {
     Title: "SCMA Waiver List",
     Author: "Rob Donnelly",
-    Creator: "SCMA Smartwaivers",
+    Creator: "scma-waivers",
     CreationDate: Time.now,
   }
 

@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require_relative "scma_smartwaiver/version"
+require_relative "scma_waivers/version"
 
-module ScmaSmartwaiver
+module ScmaWaivers
   class Error < StandardError; end
   # Your code goes here...
 end

@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-require_relative "lib/scma_smartwaiver/version"
+require_relative "lib/scma_waivers/version"
 
 Gem::Specification.new do |spec|
-  spec.name = "scma_smartwaiver"
-  spec.version = ScmaSmartwaiver::VERSION
+  spec.name = "scma_waivers"
+  spec.version = ScmaWaivers::VERSION
   spec.authors = ["Rob Donnelly"]
   spec.email = ["rfdonnelly@gmail.com"]
 
@@ -36,6 +36,9 @@ Gem::Specification.new do |spec|
   # Uncomment to register a new dependency of your gem
   spec.add_dependency "prawn", "~> 2.0"
   spec.add_dependency "net-ftp", "~> 0.3"
+  spec.add_dependency "googleauth", "~> 1.11"
+  spec.add_dependency "google-apis-drive_v3", "~> 0.59"
+  spec.add_dependency "google-apis-sheets_v4", "~> 0.38"
 
   # For more information and examples about making a new gem, check out our
   # guide at: https://bundler.io/guides/creating_gem.html

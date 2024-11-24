@@ -1,0 +1,81 @@
+#!/usr/bin/env ruby
+
+require "scma_waivers"
+
+require "googleauth"
+require "google/apis/sheets_v4"
+require "google/apis/drive_v3"
+require "yaml"
+
+Drive = Google::Apis::DriveV3
+Sheets = Google::Apis::SheetsV4
+
+SCOPES = [
+  Drive::AUTH_DRIVE,
+  Sheets::AUTH_SPREADSHEETS,
+]
+
+HEADER_MAP = {
+  "Last Name" => :lastName,
+  "First Name" => :firstName,
+  "Phone" => :phone,
+  "Emergency Contact" => :emergencyContact,
+  "Signed Date" => :createdOn,
+  "Guardian" => :guardian,
+}
+
+class App
+  def initialize
+    authorizer = Google::Auth::ServiceAccountCredentials.make_creds(
+      scope: SCOPES
+    )
+
+    @drive = Drive::DriveService.new
+    @drive.authorization = authorizer
+
+    @sheets = Sheets::SheetsService.new
+    @sheets.authorization = authorizer
+  end
+
+  def create_spreadsheet(name:)
+    spreadsheet = {
+      properties: {
+        title: name,
+      }
+    }
+    spreadsheet = @sheets.create_spreadsheet(spreadsheet, fields: "spreadsheetId")
+    $stderr.puts "spreadsheet_id:", spreadsheet.spreadsheet_id
+
+    file_id = spreadsheet.spreadsheet_id
+    permission = {
+      type: "user",
+      email_address: ENV["SCMA_PAPER_WAIVERS_SHARED_WITH"],
+      role: "writer",
+    }
+    permission = @drive.create_permission(file_id, permission)
+    $stderr.puts "permission:", permission
+
+    spreadsheet.spreadsheet_id
+  end
+
+  def parse_spreadsheet(id:)
+    range = "Waivers"
+    result = @sheets.get_spreadsheet_values(id, range)
+    header = result.values.first.map(&method(:map_header_value))
+    rows = result.values[1..]
+    rows.map { |row| header.zip(row).to_h }
+  end
+
+  def map_header_value(value)
+    HEADER_MAP[value]
+  end
+
+  def main
+    # id = create_spreadsheet(name: "SCMA Paper Waivers")
+    id = ENV["SCMA_PAPER_WAIVERS_SHEET_ID"]
+    result = parse_spreadsheet(id: id)
+    puts result.to_yaml
+  end
+end
+
+App.new.main
