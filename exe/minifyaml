@@ -41,13 +41,14 @@ def transform(waivers)
   waivers.flat_map(&method(:transform_waiver))
 end
 
+# Rules:
+# * always keep latest dupe
+# * dedupe based on lower case name
+# * TODO: dedupe adults based on lower case last name + phone number
 def dedupe(waivers)
-  # Rules:
-  # * always keep latest dupe
-  # * dedupe based on lower case name
-  # * dedupe adults based on lower case last name + phone number
   waivers
     .sort_by { |waiver| waiver[:createdOn] }
+    .reverse
     .uniq { |waiver| [waiver[:lastName].downcase, waiver[:firstName].downcase] }
 end
 
