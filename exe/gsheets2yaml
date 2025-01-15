@@ -37,7 +37,7 @@ class App
     @sheets.authorization = authorizer
   end
 
-  def create_spreadsheet(name:)
+  def create_spreadsheet(name:, shared_with:)
     spreadsheet = {
       properties: {
         title: name,
@@ -49,7 +49,7 @@ class App
     file_id = spreadsheet.spreadsheet_id
     permission = {
       type: "user",
-      email_address: ENV["SCMA_PAPER_WAIVERS_SHARED_WITH"],
+      email_address: shared_with,
       role: "writer",
     }
     permission = @drive.create_permission(file_id, permission)
@@ -58,7 +58,7 @@ class App
     spreadsheet.spreadsheet_id
   end
 
-  def parse_spreadsheet(id:)
+  def parse_spreadsheet(id)
     range = "Waivers"
     result = @sheets.get_spreadsheet_values(id, range)
     header = result.values.first.map(&method(:map_header_value))
@@ -71,9 +71,9 @@ class App
   end
 
   def main
-    # id = create_spreadsheet(name: "SCMA Paper Waivers")
+    # id = create_spreadsheet(name: "SCMA Paper Waivers", shared_with: ENV["SCMA_PAPER_WAIVERS_SHARED_WITH"])
     id = ENV["SCMA_PAPER_WAIVERS_SHEET_ID"]
-    result = parse_spreadsheet(id: id)
+    result = parse_spreadsheet(id)
     puts result.to_yaml
   end
 end
