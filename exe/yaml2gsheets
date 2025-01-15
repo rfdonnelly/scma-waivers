@@ -1,0 +1,85 @@
+#!/usr/bin/env ruby
+
+require "scma_waivers"
+
+require "googleauth"
+require "google/apis/sheets_v4"
+require "google/apis/drive_v3"
+require 'yaml'
+
+Drive = Google::Apis::DriveV3
+Sheets = Google::Apis::SheetsV4
+
+SCOPES = [
+  Drive::AUTH_DRIVE,
+  Sheets::AUTH_SPREADSHEETS,
+]
+
+class App
+  def initialize
+    authorizer = Google::Auth::ServiceAccountCredentials.make_creds(
+      scope: SCOPES
+    )
+
+    @drive = Drive::DriveService.new
+    @drive.authorization = authorizer
+
+    @sheets = Sheets::SheetsService.new
+    @sheets.authorization = authorizer
+  end
+
+  def create_spreadsheet(name:, shared_with:)
+    spreadsheet = {
+      properties: {
+        title: name,
+      }
+    }
+    spreadsheet = @sheets.create_spreadsheet(spreadsheet, fields: "spreadsheetId")
+    $stderr.puts "spreadsheet_id:", spreadsheet.spreadsheet_id
+
+    file_id = spreadsheet.spreadsheet_id
+    permission = {
+      type: "user",
+      email_address: shared_with,
+      role: "writer",
+    }
+    permission = @drive.create_permission(file_id, permission)
+    $stderr.puts "permission:", permission
+
+    spreadsheet.spreadsheet_id
+  end
+
+  def write_spreadsheet(id, waivers)
+    rows = waivers.map do |waiver|
+      [:firstName, :lastName, :createdOn, :phone, :emergencyContact, :guardian].map { |k| waiver[k] }
+    end
+
+    row_objects = rows.map do |row|
+      values = row.map { |cell| { userEnteredValue: cell } }
+      { values: values }
+    end
+
+    request = {
+      requests: [{
+        updateCells: {
+          rows: row_objects,
+        },
+      }],
+      includeSpreadsheetInResponse: false,
+    }
+
+    result = @sheets.batch_update_spreadsheet(id, request)
+
+    require 'pp'
+    pp result
+  end
+
+  def main
+    # id = create_spreadsheet(name: "SCMA Waivers", shared_with: ENV["SCMA_PAPER_WAIVERS_SHARED_WITH"])
+    waivers = YAML.load(ARGF.read)
+    id = ENV["SCMA_WAIVERS_SHEET_ID"]
+    write_spreadsheet(id, waivers)
+  end
+end
+
+App.new.main

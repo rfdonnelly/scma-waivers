@@ -25,6 +25,10 @@ file "waivers.yml" => ["paperwaivers.yml", "smartwaivers.yml"] do
   sh "mergewaivers paperwaivers.yml smartwaivers.yml >waivers.yml"
 end
 
+multitask "gsheets" => "waivers.yml" do
+  sh "yaml2gsheets <waivers.yml"
+end
+
 file "waivers.csv" => "waivers.yml" do
   sh "yaml2csv <waivers.yml >waivers.csv"
 end
