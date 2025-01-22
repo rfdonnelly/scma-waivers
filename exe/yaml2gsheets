@@ -5,6 +5,7 @@ require "scma_waivers"
 require "googleauth"
 require "google/apis/sheets_v4"
 require "google/apis/drive_v3"
+
 require 'yaml'
 
 Drive = Google::Apis::DriveV3
@@ -51,23 +52,38 @@ class App
 
   def write_spreadsheet(id, waivers)
     rows = waivers.map do |waiver|
-      [:firstName, :lastName, :createdOn, :phone, :emergencyContact, :guardian].map { |k| waiver[k] }
+      [:firstName, :lastName, :createdOn, :phone, :emergencyContact, :guardian]
+        .map { |k| waiver[k] }
     end
 
     row_objects = rows.map do |row|
-      values = row.map { |cell| { userEnteredValue: cell } }
-      { values: values }
+      values = row.map do |cell|
+        {
+          'userEnteredValue' => {
+            'stringValue' => cell,
+          },
+        }
+      end
+      { 'values' => values }
     end
 
     request = {
-      requests: [{
-        updateCells: {
-          rows: row_objects,
+      'requests' => [{
+        'updateCells' => {
+          'rows' => row_objects,
+          'fields' => 'userEnteredValue',
+          'start' => {
+            'sheetId' => 0,
+            'rowIndex' => 0,
+            'columnIndex' => 0,
+          },
         },
       }],
-      includeSpreadsheetInResponse: false,
+      'includeSpreadsheetInResponse' => false,
     }
 
+    require 'json'
+    puts request.to_json
     result = @sheets.batch_update_spreadsheet(id, request)
 
     require 'pp'
@@ -77,7 +93,7 @@ class App
   def main
     # id = create_spreadsheet(name: "SCMA Waivers", shared_with: ENV["SCMA_PAPER_WAIVERS_SHARED_WITH"])
     waivers = YAML.load(ARGF.read)
-    id = ENV["SCMA_WAIVERS_SHEET_ID"]
+    id = ENV["SCMA_GSHEETS_WAIVERS_SHEET_ID"]
     write_spreadsheet(id, waivers)
   end
 end
