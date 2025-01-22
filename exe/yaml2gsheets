@@ -59,32 +59,37 @@ class App
     row_objects = rows.map do |row|
       values = row.map do |cell|
         {
-          'userEnteredValue' => {
-            'stringValue' => cell,
+          user_entered_value: {
+            string_value: cell,
           },
         }
       end
-      { 'values' => values }
+      { values: values }
     end
 
     request = {
-      'requests' => [{
-        'updateCells' => {
-          'rows' => row_objects,
-          'fields' => 'userEnteredValue',
-          'start' => {
-            'sheetId' => 0,
-            'rowIndex' => 0,
-            'columnIndex' => 0,
+      requests: [{
+        update_cells: {
+          rows: row_objects,
+          fields: 'user_entered_value',
+          start: {
+            sheet_id: 0,
+            row_index: 0,
+            column_index: 0,
           },
         },
       }],
-      'includeSpreadsheetInResponse' => false,
+      include_spreadsheet_in_response: false,
     }
 
     require 'json'
-    puts request.to_json
-    result = @sheets.batch_update_spreadsheet(id, request)
+    puts JSON.pretty_generate(request)
+    result = begin
+      @sheets.batch_update_spreadsheet(id, request)
+    rescue Exception => e
+      puts e.inspect
+      puts JSON.load(e.body.inspect)
+    end
 
     require 'pp'
     pp result
