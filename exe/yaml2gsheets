@@ -51,10 +51,12 @@ class App
   end
 
   def write_spreadsheet(id, waivers)
-    rows = waivers.map do |waiver|
+    header_row = ["First Name", "Last Name", "Date", "Phone", "Emergency Contact", "Guardian"]
+    data_rows = waivers.map do |waiver|
       [:firstName, :lastName, :createdOn, :phone, :emergencyContact, :guardian]
         .map { |k| waiver[k] }
     end
+    rows = [header_row].chain(data_rows)
 
     row_objects = rows.map do |row|
       values = row.map do |cell|
